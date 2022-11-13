@@ -1,17 +1,27 @@
 #!/usr/bin/python3
+"""
+We needed to check that our CDN was distributing the correct version of a js
+To verifiy the correct file I check the presence of a json and if it is not the correct
+the script sends a message to a telegram channel.
+As debug information I add which CND nodes are at work ("via" header), the Etag and the size.
+Positive checks are only logged
+This script was setup in cron to run every 10 minutes
+"""
 import requests
 import logging
+# I have setup logging in logsetup.py
 from mylogging import logsetup
 try:
     from secrets import secrets
 except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
+    print("Secrets are kept in secrets.py, please add them there!")
 
 # setup my custom logging
 logger = logsetup()
 
 # Send message to Telegram
 def telegram_bot_sendtext(bot_message):
+   #get secrets from secrets.py 
    bot_token = secrets.get('TELEGRAM_BOT_TOKEN')
    bot_chatID = secrets.get('TELEGRAM_CHATID')
    send_text = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + bot_chatID + '&parse_mode=Markdown&text=' + bot_message
@@ -26,8 +36,6 @@ logging.getLogger("urllib3").setLevel(logging.CRITICAL)
 url = 'https://risorse.tim.it/etc.clientlibs/flytobuself/clientlibs/1.0.63/clientlib-base.min.js'
 # Define Correct Json
 correct_json = "https://timbusiness.tim.it/content/flybu/it/fisso/vendibilita.model.json"
-# Define Wrong Json
-wrong_json = "https://www.timbusiness.it/content/flybu/it/fisso/vendibilita.model.json"
 # No cache headers
 h = {
     "Cache-Control": "no-cache",
@@ -40,7 +48,7 @@ if response:
     contentlength = response.headers['content-length']
     if correct_json in response.text:
         logger.info('clientlib-base.min.js OK - node(s):[' + node + '] etag:[' + etag + '] content-lenght:['+ contentlength + ']')
-    if wrong_json in response.text:
+    else:
         logger.info('clientlib-base.min.js NON OK - node(s):[' + node + '] etag:[' + etag + '] content-lenght:['+ contentlength + ']')
         telegram_bot_sendtext('clientlib-base.min.js NON OK - node(s):[' + node + '] etag:[' + etag + '] content-lenght:['+ contentlength + ']')
 else:
