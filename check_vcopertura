@@ -2,7 +2,10 @@
 import requests
 import logging
 from mylogging import logsetup
-from secrets import secrets
+try:
+    from secrets import secrets
+except ImportError:
+    print("WiFi secrets are kept in secrets.py, please add them there!")
 
 # setup my custom logging
 logger = logsetup()
