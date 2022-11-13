@@ -1,0 +1,44 @@
+#!/usr/bin/python3
+import requests
+import logging
+from mylogging import logsetup
+from secrets import secrets
+
+# setup my custom logging
+logger = logsetup()
+
+# Send message to Telegram
+def telegram_bot_sendtext(bot_message):
+   bot_token = secrets.get('TELEGRAM_BOT_TOKEN')
+   bot_chatID = secrets.get('TELEGRAM_CHATID')
+   send_text = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + bot_chatID + '&parse_mode=Markdown&text=' + bot_message
+   response = requests.get(send_text)
+   return response.json()
+
+# stop requests and urllib from logging
+logging.getLogger("requests").setLevel(logging.CRITICAL)
+logging.getLogger("urllib3").setLevel(logging.CRITICAL)
+
+# Define URL to search
+url = 'https://risorse.tim.it/etc.clientlibs/flytobuself/clientlibs/1.0.63/clientlib-base.min.js'
+# Define Correct Json
+correct_json = "https://timbusiness.tim.it/content/flybu/it/fisso/vendibilita.model.json"
+# Define Wrong Json
+wrong_json = "https://www.timbusiness.it/content/flybu/it/fisso/vendibilita.model.json"
+# No cache headers
+h = {
+    "Cache-Control": "no-cache",
+    "Pragma": "no-cache"
+}
+response = requests.get(url, headers=h)
+if response:
+    node = response.headers['via']
+    etag = response.headers['etag']
+    contentlength = response.headers['content-length']
+    if correct_json in response.text:
+        logger.info('clientlib-base.min.js OK - node(s):[' + node + '] etag:[' + etag + '] content-lenght:['+ contentlength + ']')
+    if wrong_json in response.text:
+        logger.info('clientlib-base.min.js NON OK - node(s):[' + node + '] etag:[' + etag + '] content-lenght:['+ contentlength + ']')
+        telegram_bot_sendtext('clientlib-base.min.js NON OK - node(s):[' + node + '] etag:[' + etag + '] content-lenght:['+ contentlength + ']')
+else:
+    logger.error('unable to access ' + url)

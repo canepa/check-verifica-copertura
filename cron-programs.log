@@ -1,0 +1,2 @@
+[2022-11-13,12:50:05] {/home/canepa/check-verifica-copertura/./check_vcopertura:37} INFO - clientlib-base.min.js OK - node(s):[http/1.1 se-mi1-18.cdn.interbusiness.it (), http/1.1 se-rm4-13.cdn.interbusiness.it ()] etag:["7a9ec-5ed35d23a4a1c-gzip"] content-lenght:[115609]
+[2022-11-13,13:50:35] {/home/canepa/check-verifica-copertura/./check_vcopertura:39} INFO - clientlib-base.min.js OK - node(s):[http/1.1 se-mi1-18.cdn.interbusiness.it (), http/1.1 se-rm4-11.cdn.interbusiness.it ()] etag:["7a9ec-5ed35d23a4a1c-gzip"] content-lenght:[115609]
